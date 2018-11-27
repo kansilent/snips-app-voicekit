@@ -5,7 +5,7 @@ from snipsTools import SnipsConfigParser
 from hermes_python.hermes import Hermes
 from hermes_python.ontology import *
 import io
-# import grove.grove_relay
+import grove.grove_relay
 # import grove.grove_temperature_humidity_sensor_sht3x
 from gpiozero import LED
 
@@ -33,9 +33,9 @@ class VoiceKit(object):
             self.config = None
             self.mqtt_address = MQTT_ADDR
 
-        # self.relay = grove.grove_relay.Grove(12)
+        self.relay = grove.grove_relay.Grove(12)
         # self.temperature_humidity_sensor = grove.grove_temperature_humidity_sensor_sht3x.Grove()
-        self.led = LED(12)
+        # self.led = LED(12)
 
         # start listening to MQTT
         self.start_blocking()
@@ -46,7 +46,8 @@ class VoiceKit(object):
         
         # action code goes here...
         print '[Received] intent: {}'.format(intent_message.intent.intent_name)
-        self.led.on()
+        # self.led.on()
+        self.relay.on()
 
         # if need to speak the execution result by tts
         hermes.publish_start_session_notification(intent_message.site_id, "OK, Light is on", "")
@@ -59,7 +60,8 @@ class VoiceKit(object):
         
         # action code goes here...
         print '[Received] intent: {}'.format(intent_message.intent.intent_name)
-        self.led.off()
+        # self.led.off()
+        self.relay.off()
 
         # if need to speak the execution result by tts
         hermes.publish_start_session_notification(intent_message.site_id, "OK, Light is closed", "")
