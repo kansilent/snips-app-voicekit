@@ -1,5 +1,6 @@
 # Bindings for the hermes protocol 
 hermes-python>=0.1
 grove.py>=0.6
+gpiozero>=1.4
 
 # More dependency goes here.. 

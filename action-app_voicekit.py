@@ -5,8 +5,9 @@ from snipsTools import SnipsConfigParser
 from hermes_python.hermes import Hermes
 from hermes_python.ontology import *
 import io
-import grove.grove_relay
-import grove.grove_temperature_humidity_sensor_sht3x
+# import grove.grove_relay
+# import grove.grove_temperature_humidity_sensor_sht3x
+from gpiozero import LED
 
 CONFIG_INI = "config.ini"
 
@@ -32,71 +33,100 @@ class VoiceKit(object):
             self.config = None
             self.mqtt_address = MQTT_ADDR
 
-        self.relay = grove.grove_relay.Grove(12)
-        self.temperature_humidity_sensor = grove.grove_temperature_humidity_sensor_sht3x.Grove()
+        # self.relay = grove.grove_relay.Grove(12)
+        # self.temperature_humidity_sensor = grove.grove_temperature_humidity_sensor_sht3x.Grove()
+        self.led = LED(12)
 
         # start listening to MQTT
         self.start_blocking()
         
-    # --> Sub callback function, one per intent
-    def relay_on(self, hermes, intent_message):
+    def light_on(self, hermes, intent_message):
         # terminate the session first if not continue
         hermes.publish_end_session(intent_message.session_id, "")
         
         # action code goes here...
         print '[Received] intent: {}'.format(intent_message.intent.intent_name)
-        self.relay.on()
+        self.led.on()
 
         # if need to speak the execution result by tts
-        hermes.publish_start_session_notification(intent_message.site_id, "Relay is on", "")
+        hermes.publish_start_session_notification(intent_message.site_id, "OK, Light is on", "")
 
-    def relay_off(self, hermes, intent_message):
+
+
+    def light_off(self, hermes, intent_message):
         # terminate the session first if not continue
         hermes.publish_end_session(intent_message.session_id, "")
-
+        
         # action code goes here...
         print '[Received] intent: {}'.format(intent_message.intent.intent_name)
-        self.relay.off()
+        self.led.off()
 
         # if need to speak the execution result by tts
-        hermes.publish_start_session_notification(intent_message.site_id, "Relay is off", "")
+        hermes.publish_start_session_notification(intent_message.site_id, "OK, Light is closed", "")
 
-    def answer_temperature(self, hermes, intent_message):
-        # terminate the session first if not continue
-        hermes.publish_end_session(intent_message.session_id, "")
+    # # --> Sub callback function, one per intent
+    # def relay_on(self, hermes, intent_message):
+    #     # terminate the session first if not continue
+    #     hermes.publish_end_session(intent_message.session_id, "")
+        
+    #     # action code goes here...
+    #     print '[Received] intent: {}'.format(intent_message.intent.intent_name)
+    #     self.relay.on()
 
-        # action code goes here...
-        print '[Received] intent: {}'.format(intent_message.intent.intent_name)
+    #     # if need to speak the execution result by tts
+    #     hermes.publish_start_session_notification(intent_message.site_id, "Relay is on", "")
 
-        # In Celsius
-        temperature, _ = self.temperature_humidity_sensor.read()
+    # def relay_off(self, hermes, intent_message):
+    #     # terminate the session first if not continue
+    #     hermes.publish_end_session(intent_message.session_id, "")
 
-        # if need to speak the execution result by tts
-        hermes.publish_start_session_notification(intent_message.site_id, "The temperature is {} degree".format(int(temperature)), "")
+    #     # action code goes here...
+    #     print '[Received] intent: {}'.format(intent_message.intent.intent_name)
+    #     self.relay.off()
 
-    def answer_humidity(self, hermes, intent_message):
-        # terminate the session first if not continue
-        hermes.publish_end_session(intent_message.session_id, "")
+    #     # if need to speak the execution result by tts
+    #     hermes.publish_start_session_notification(intent_message.site_id, "Relay is off", "")
 
-        # action code goes here...
-        print '[Received] intent: {}'.format(intent_message.intent.intent_name)
+    # def answer_temperature(self, hermes, intent_message):
+    #     # terminate the session first if not continue
+    #     hermes.publish_end_session(intent_message.session_id, "")
 
-        _, humidity = self.temperature_humidity_sensor.read()
+    #     # action code goes here...
+    #     print '[Received] intent: {}'.format(intent_message.intent.intent_name)
 
-        # if need to speak the execution result by tts
-        hermes.publish_start_session_notification(intent_message.site_id, "The humidity is {} percent".format(int(humidity)), "")
+    #     # In Celsius
+    #     temperature, _ = self.temperature_humidity_sensor.read()
+
+    #     # if need to speak the execution result by tts
+    #     hermes.publish_start_session_notification(intent_message.site_id, "The temperature is {} degree".format(int(temperature)), "")
+
+    # def answer_humidity(self, hermes, intent_message):
+    #     # terminate the session first if not continue
+    #     hermes.publish_end_session(intent_message.session_id, "")
+
+    #     # action code goes here...
+    #     print '[Received] intent: {}'.format(intent_message.intent.intent_name)
+
+    #     _, humidity = self.temperature_humidity_sensor.read()
+
+    #     # if need to speak the execution result by tts
+    #     hermes.publish_start_session_notification(intent_message.site_id, "The humidity is {} percent".format(int(humidity)), "")
 
     # --> Master callback function, triggered everytime an intent is recognized
     def master_intent_callback(self,hermes, intent_message):
         coming_intent = intent_message.intent.intent_name
-        if coming_intent == 'seeed:relay_on':
-            self.relay_on(hermes, intent_message)
-        elif coming_intent == 'seeed:relay_off':
-            self.relay_off(hermes, intent_message)
-        elif coming_intent == 'seeed:ask_temperature':
-            self.answer_temperature(hermes, intent_message)
-        elif coming_intent == 'seeed:ask_humidity':
-            self.answer_humidity(hermes, intent_message)
+        # if coming_intent == 'seeed:relay_on':
+        #     self.relay_on(hermes, intent_message)
+        # elif coming_intent == 'seeed:relay_off':
+        #     self.relay_off(hermes, intent_message)
+        # elif coming_intent == 'seeed:ask_temperature':
+        #     self.answer_temperature(hermes, intent_message)
+        # elif coming_intent == 'seeed:ask_humidity':
+        #     self.answer_humidity(hermes, intent_message)
+        if coming_intent == 'jug997:turnlightson':
+            self.light_on(hermes, intent_message)
+        elif coming_intent == 'jug997:turnlightsoff':
+            self.light_off(hermes, intent_message)
 
     # --> Register callback function and start MQTT
     def start_blocking(self):
