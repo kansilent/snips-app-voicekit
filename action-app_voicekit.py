@@ -39,6 +39,7 @@ class VoiceKit(object):
 
         # start listening to MQTT
         self.start_blocking()
+        self.previous_intent = "nothing"
         
     def good_morning(self, hermes, intent_message):
         # terminate the session first if not continue
@@ -52,9 +53,7 @@ class VoiceKit(object):
         # if need to speak the execution result by tts
         hermes.publish_start_session_notification(intent_message.site_id, "Good morning, the morning pills are 1 piece A and 2 pieces B", "")
 
-
-
-    def thank_you(self, hermes, intent_message):
+    def thank_you1(self, hermes, intent_message):
         # terminate the session first if not continue
         hermes.publish_end_session(intent_message.session_id, "")
         
@@ -78,9 +77,7 @@ class VoiceKit(object):
         # if need to speak the execution result by tts
         hermes.publish_start_session_notification(intent_message.site_id, "Good afternoon, the afternoon pills are 2 pieces C", "")
 
-
-
-    def thank_you(self, hermes, intent_message):
+    def thank_you2(self, hermes, intent_message):
         # terminate the session first if not continue
         hermes.publish_end_session(intent_message.session_id, "")
         
@@ -92,7 +89,7 @@ class VoiceKit(object):
         # if need to speak the execution result by tts
         hermes.publish_start_session_notification(intent_message.site_id, "You are welcome, you are so sweet xin xin", "")
         
-            def good_evening(self, hermes, intent_message):
+    def good_evening(self, hermes, intent_message):
         # terminate the session first if not continue
         hermes.publish_end_session(intent_message.session_id, "")
         
@@ -104,9 +101,7 @@ class VoiceKit(object):
         # if need to speak the execution result by tts
         hermes.publish_start_session_notification(intent_message.site_id, "Good evening, the evening pills are 2 pieces A", "")
 
-
-
-    def thank_you(self, hermes, intent_message):
+    def thank_you3(self, hermes, intent_message):
         # terminate the session first if not continue
         hermes.publish_end_session(intent_message.session_id, "")
         
@@ -117,80 +112,42 @@ class VoiceKit(object):
 
         # if need to speak the execution result by tts
         hermes.publish_start_session_notification(intent_message.site_id, "It's my pleasure, good night xin xin", "")
+    
+    
+    def thank_you(self, hermes, intent_message):
+        # terminate the session first if not continue
+        hermes.publish_end_session(intent_message.session_id, "")
         
-    # # --> Sub callback function, one per intent
-    # def relay_on(self, hermes, intent_message):
-    #     # terminate the session first if not continue
-    #     hermes.publish_end_session(intent_message.session_id, "")
-        
-    #     # action code goes here...
-    #     print '[Received] intent: {}'.format(intent_message.intent.intent_name)
-    #     self.relay.on()
+        # action code goes here...
+        print '[Received] intent: {}'.format(intent_message.intent.intent_name)
+        # self.led.off()
+        self.relay.off()
 
-    #     # if need to speak the execution result by tts
-    #     hermes.publish_start_session_notification(intent_message.site_id, "Relay is on", "")
-
-    # def relay_off(self, hermes, intent_message):
-    #     # terminate the session first if not continue
-    #     hermes.publish_end_session(intent_message.session_id, "")
-
-    #     # action code goes here...
-    #     print '[Received] intent: {}'.format(intent_message.intent.intent_name)
-    #     self.relay.off()
-
-    #     # if need to speak the execution result by tts
-    #     hermes.publish_start_session_notification(intent_message.site_id, "Relay is off", "")
-
-    # def answer_temperature(self, hermes, intent_message):
-    #     # terminate the session first if not continue
-    #     hermes.publish_end_session(intent_message.session_id, "")
-
-    #     # action code goes here...
-    #     print '[Received] intent: {}'.format(intent_message.intent.intent_name)
-
-    #     # In Celsius
-    #     temperature, _ = self.temperature_humidity_sensor.read()
-
-    #     # if need to speak the execution result by tts
-    #     hermes.publish_start_session_notification(intent_message.site_id, "The temperature is {} degree".format(int(temperature)), "")
-
-    # def answer_humidity(self, hermes, intent_message):
-    #     # terminate the session first if not continue
-    #     hermes.publish_end_session(intent_message.session_id, "")
-
-    #     # action code goes here...
-    #     print '[Received] intent: {}'.format(intent_message.intent.intent_name)
-
-    #     _, humidity = self.temperature_humidity_sensor.read()
-
-    #     # if need to speak the execution result by tts
-    #     hermes.publish_start_session_notification(intent_message.site_id, "The humidity is {} percent".format(int(humidity)), "")
+        # if need to speak the execution result by tts
+        hermes.publish_start_session_notification(intent_message.site_id, "ha ha ha ha ha", "")
 
     # --> Master callback function, triggered everytime an intent is recognized
     def master_intent_callback(self,hermes, intent_message):
         coming_intent = intent_message.intent.intent_name
-        # if coming_intent == 'seeed:relay_on':
-        #     self.relay_on(hermes, intent_message)
-        # elif coming_intent == 'seeed:relay_off':
-        #     self.relay_off(hermes, intent_message)
-        # elif coming_intent == 'seeed:ask_temperature':
-        #     self.answer_temperature(hermes, intent_message)
-        # elif coming_intent == 'seeed:ask_humidity':
-        #     self.answer_humidity(hermes, intent_message)
-        if coming_intent == 'Angel:Morning_Pill_reminder':
-            self.good_morning(hermes, intent_message)
-        elif coming_intent == 'Angel:compliments':
-            self.thank_you(hermes, intent_message)
-            
-        if coming_intent == 'Angel:Afternoon_Pill_reminder':
+
+        if coming_intent == 'Winnie:Morning_Pill_reminder':
+            self.previous_intent = coming_intent
+            self.good_morning(hermes, intent_message)   
+        elif coming_intent == 'Winnie:Afternoon_Pill_reminder':
+            self.previous_intent = coming_intent
             self.good_afternoon(hermes, intent_message)
-        elif coming_intent == 'Angel:compliments':
-            self.thank_you(hermes, intent_message)
-            
-        if coming_intent == 'Angel:Evening_Pill_reminder':
+        elif coming_intent == 'Winnie:Evening_Pill_reminder':
+            self.previous_intent = coming_intent
             self.good_evening(hermes, intent_message)
-        elif coming_intent == 'Angel:compliments':
-            self.thank_you(hermes, intent_message)
+        elif coming_intent == 'Winnie:compliments':
+            if self.previous_intent == "Winnie:Morning_Pill_reminder":
+                self.thank_you1(hermes, intent_message)
+            elif self.previous_intent == "Winnie:Afternoon_Pill_reminder":
+                self.thank_you2(hermes, intent_message)
+            elif self.previous_intent == "Winnie:Evening_Pill_reminder":
+                self.thank_you3(hermes, intent_message)   
+            else:
+                self.thank_you(hermes, intent_message)
 
     # --> Register callback function and start MQTT
     def start_blocking(self):
